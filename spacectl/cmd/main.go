@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kubespaces/kubespaces-public/spacectl/cmd/tenant"
 	"github.com/spf13/cobra"
 )
 
