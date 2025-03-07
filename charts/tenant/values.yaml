@@ -1,0 +1,93 @@
+# values.yaml for vcluster helm chart
+
+# -- vcluster values
+vcluster:
+  # -- vcluster isolation
+  policies:
+    podSecurityStandard: baseline
+
+    resourceQuota:
+      enabled: true
+      # -- default quotas for the vcluster
+      quota:
+        requests.cpu: 10
+        requests.memory: 20Gi
+        requests.storage: "100Gi"
+        requests.ephemeral-storage: 60Gi
+        limits.cpu: 20
+        limits.memory: 40Gi
+        limits.ephemeral-storage: 160Gi
+        services.nodeports: 0
+        services.loadbalancers: 0
+        count/endpoints: 40
+        count/pods: 200
+        count/services: 200
+        count/secrets: 100
+        count/configmaps: 100
+        count/persistentvolumeclaims: 20
+    # -- default values for the pods in the vcluster
+    limitRange:
+      enabled: true
+      default:
+        ephemeral-storage: 8Gi
+        memory: 2Gi
+        cpu: "4"
+      defaultRequest:
+        ephemeral-storage: 3Gi
+        memory: 128Mi
+        cpu: 100m
+
+    networkPolicy:
+      enabled: true
+
+  # -- this is crucial to allow the resulting kubeconfig to be used by the vcluster
+  controlPlane:
+    proxy:
+      # -- placeholder, must be set and cannot work with default values
+      extraSANs:
+      - api.$tenant.$org.$location.$cloud.$domain
+    distro:
+      k8s:
+        version: v1.31.1
+  telemetry:
+    enabled: false
+  exportKubeConfig:
+    server: https://api.$tenant.$org.$location.$cloud.$domain:443
+
+  experimental:
+    genericSync:
+      role:
+        extraRules:
+          - apiGroups: ["gateway.networking.k8s.io"]
+            resources: ["httproutes", "tcproutes", "udproutes", "tlsroutes"]
+            verbs: ["create", "delete", "patch", "update", "get", "list", "watch"]
+      clusterRole:
+        extraRules:
+          - apiGroups: ["apiextensions.k8s.io"]
+            resources: ["customresourcedefinitions"]
+            verbs: ["get", "list", "watch"]
+      export:
+        - apiVersion: gateway.networking.k8s.io/v1
+          kind: HTTPRoute
+
+# -- system values
+system:
+  # -- the namespace where the gateway is deployed. Note that Envoy will always deploy the actual gateway pod in its own system namespace, usually envoy-gateway-system
+  namespace: istio-system
+  # -- the gateway name
+  gateway: api
+  # -- in on premise installations, the external IP of the gateway appliance
+  target: null
+tenant:
+  # -- short location name, e.g. ne=northeurope, we=westeurope etc, 
+  location_short: rks
+  # -- the cloud, azure, aws, gcp
+  cloud: azure
+  # -- tenant name, e.g. dev, prod, test, cannot be default
+  name: dev
+  # -- the org name, e.g. contoso
+  org: contoso
+  # -- the domain name, e.g. contoso.com
+  domain: kubespaces.cloud 
+  # -- the API port for the vcluster kubernetes API Server
+  api_port: 443

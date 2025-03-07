@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: external-dns
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: external-dns-values
+  namespace: external-dns
+data:
+  values.yaml: |    
+    provider: azure
+    interval: 15s
+    domainFilters:
+      - "kubespaces.cloud"
+    logLevel: debug
+    env:
+    - name: EXTERNAL_DNS_TXT_OWNER_ID      
+      valueFrom:
+        configMapKeyRef:
+          name: txt-owner-id
+          key: txt-owner-id
+    sources:
+      - service
+      - ingress
+      - gateway-httproute
+      - gateway-tlsroute
+      - gateway-udproute
+      - gateway-tcproute
+    extraVolumes:
+      - name: azure-config-file
+        secret:
+          secretName: azure-config-file
+    extraVolumeMounts:
+      - name: azure-config-file
+        mountPath: /etc/kubernetes
+        readOnly: true
+    rbac:
+      create: true
+    publishInternalServices: true
+    policy: sync
+    azure:
+      secretName: azure-config-file

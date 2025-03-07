@@ -1,0 +1,30 @@
+name: Push Helm Chart to GHCR
+
+on:
+  push:
+    branches: ['main']
+    paths: ['charts/**']
+  workflow_dispatch:
+
+jobs:
+    push:
+        runs-on: ubuntu-latest
+        permissions:
+          packages: write
+          contents: read
+        steps:
+        - name: Checkout repository
+          uses: actions/checkout@v3
+    
+        - name: Set up Helm
+          uses: azure/setup-helm@v4.2.0
+    
+        - name: Push Helm Chart
+          run: |
+            cd charts/tenant
+            export CHART_VERSION=$(grep -m 1 '^version:' Chart.yaml| awk '{print $2}')
+            helm registry login -u ams0 -p $GH_TOKEN ghcr.io
+            helm package  -u .
+            helm push tenant-${CHART_VERSION}.tgz oci://ghcr.io/${{ github.repository }}
+          env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

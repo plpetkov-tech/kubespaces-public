@@ -1,0 +1,22 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: api-{{ .Values.tenant.name }}-{{ .Values.tenant.org }}
+  namespace: {{ .Values.system.namespace }}
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: api.{{ .Values.tenant.name }}.{{ .Values.tenant.org }}.{{ .Values.tenant.location_short }}.{{ .Values.tenant.cloud }}.{{ .Values.tenant.domain }}
+    {{- if .Values.system.target }}
+    external-dns.alpha.kubernetes.io/target: {{ .Values.system.target }}
+    {{- end }}
+spec:
+  parentRefs:
+  - name: {{ .Values.system.gateway }} # this is defined in the Gateway in the system namespace
+    namespace: {{ .Values.system.namespace }}
+    sectionName: apipassthrough # this is defined in the Gateway in the system namespace
+  hostnames:
+  - "api.{{ .Values.tenant.name }}.{{ .Values.tenant.org }}.{{ .Values.tenant.location_short }}.{{ .Values.tenant.cloud }}.{{ .Values.tenant.domain }}"
+  rules:
+  - backendRefs:
+    - name: "{{ .Values.tenant.name }}-{{ .Values.tenant.org }}"
+      port: {{ .Values.tenant.api_port }}
+      namespace: "{{ .Values.tenant.name }}-{{ .Values.tenant.org }}"

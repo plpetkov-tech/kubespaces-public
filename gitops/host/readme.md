@@ -1,0 +1,1 @@
+# GitOps manifests for the host cluster

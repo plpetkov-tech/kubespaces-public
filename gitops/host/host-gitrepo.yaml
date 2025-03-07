@@ -1,0 +1,18 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: kubespaces-public
+  namespace: flux-system
+spec:
+  interval: 0m30s
+  url: https://github.com/kubespaces-io/kubespaces-public
+  ref:
+    branch: main
+  ignore: |
+    # exclude all
+    /*
+    # include gitops dir
+    !/gitops
+    # exclude file extensions from deploy dir
+    /deploy/**/*.md
+    /deploy/**/*.txt

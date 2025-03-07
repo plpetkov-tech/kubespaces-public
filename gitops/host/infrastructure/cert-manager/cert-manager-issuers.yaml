@@ -1,0 +1,32 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cert-manager-issuers
+  namespace: cert-manager
+spec:
+  interval: 10m
+  timeout: 5m
+  chart:
+    spec:
+      chart: cert-manager-issuers
+      version: 0.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: adfinis
+        namespace: flux-system
+      interval: 5m
+  releaseName: cert-manager-issuers
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  test:
+    enable: true
+  driftDetection:
+    mode: enabled
+  valuesFrom:
+    - kind: ConfigMap
+      name: cert-manager-issuers-values
+      valuesKey: values.yaml

@@ -1,0 +1,11 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
+metadata:
+  name: tenant-helmrepo
+  namespace: flux-system
+spec:
+  interval: 5m
+  url: oci://ghcr.io/kubespaces-io/kubespaces-public/tenant
+  ref:
+    tag: 0.1.3
