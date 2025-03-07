@@ -54,7 +54,7 @@ az aks nodepool add \
     --os-type Linux  \
     --os-sku AzureLinux \
     --node-vm-size $TENANT_NODE_SIZE \
-    --labels "priority=spot","workload=tenants"  \
+    --labels "workload=tenants" --labels "priority=spot" \
     -n tenants \
     --mode User \
     --vm-set-type VirtualMachineScaleSets --no-wait
