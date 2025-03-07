@@ -3,7 +3,7 @@
 ## Azure
 
 ```bash
-export CLUSTER_RG=kubespaces
+export CLUSTER_RG=demo
 export CLUSTER_NAME=kubespaces
 export AKS_VERSION=1.32.0
 export BASE_NODE_COUNT=2
@@ -14,14 +14,10 @@ export NODE_SIZE=Standard_D16s_v6
 export TENANT_NODE_MIN_COUNT=0
 export TENANT_NODE_MAX_COUNT=10
 export TENANT_NODE_SIZE=Standard_D16s_v6
-
 ```
 
 ```bash
 az group create --name $CLUSTER_RG --location $LOCATION
-```
-
-```bash
 az aks create \
     --resource-group $CLUSTER_RG \
     --name $CLUSTER_NAME \
