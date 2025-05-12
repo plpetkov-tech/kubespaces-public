@@ -11,7 +11,7 @@ export cloud=azure
 export domain=kubespaces.cloud
 
 helm upgrade -i -n $tenant-$org --create-namespace \
-$tenant-$org oci://ghcr.io/kubespaces-io/kubespaces-public/tenant --version 0.1.3 \
+ $tenant-$org oci://ghcr.io/kubespaces-io/kubespaces-public/tenant --version 0.1.3 \
 --set tenant.location_short=$location_short \
 --set tenant.cloud=$cloud \
 --set tenant.name=$tenant \

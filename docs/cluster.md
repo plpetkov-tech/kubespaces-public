@@ -5,7 +5,7 @@
 ```bash
 export CLUSTER_RG=demo
 export CLUSTER_NAME=kubespaces
-export AKS_VERSION=1.32.0
+export AKS_VERSION=1.32.2
 export BASE_NODE_COUNT=2
 export NODE_MAX=5
 export NODE_MIN=2
@@ -72,7 +72,7 @@ Install flux (needs the flux cli installed):
 flux install
 ```
 
-Create the secrets before continuing, check secrets.md for more information.
+Create the [secrets](./secrets.md) before continuing!
 
 Add the flux repo and the first kustomization:
 
