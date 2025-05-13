@@ -4,14 +4,14 @@
 cd charts/vcluster
 
 ```bash
-export tenant=bldrcon
-export org=bldrnet
+export tenant=suse
+export org=meetup
 export location_short=ne
 export cloud=azure
 export domain=kubespaces.cloud
 
 helm upgrade -i -n $tenant-$org --create-namespace \
- $tenant-$org oci://ghcr.io/kubespaces-io/kubespaces-public/tenant --version 0.1.3 \
+ $tenant-$org oci://ghcr.io/kubespaces-io/kubespaces-public/tenant --version 0.1.4 \
 --set tenant.location_short=$location_short \
 --set tenant.cloud=$cloud \
 --set tenant.name=$tenant \
@@ -25,7 +25,8 @@ helm upgrade -i -n $tenant-$org --create-namespace \
 Access the tenant:
 
 ```bash
-kubectl get secret $tenant-$org-kubeconfig -n $tenant-$org -o jsonpath='{.data.kubeconfig}' | base64 -d > /tmp/$tenant-$org-kubeconfig
+kubectl get secret vc-$tenant-$org -n $tenant-$org -o yaml -o jsonpath='{.data.config}' | base64 -d > /tmp/$tenant-$org-kubeconfig
 export KUBECONFIG=/tmp/$tenant-$org-kubeconfig
-kubectl get pods
+kubectl get pods -A
+kubectl get nodes
 ```

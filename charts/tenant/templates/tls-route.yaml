@@ -2,7 +2,7 @@ apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: TLSRoute
 metadata:
   name: api-{{ .Values.tenant.name }}-{{ .Values.tenant.org }}
-  namespace: {{ .Values.system.namespace }}
+  namespace: {{ .Release.Namespace }}
   annotations:
     external-dns.alpha.kubernetes.io/hostname: api.{{ .Values.tenant.name }}.{{ .Values.tenant.org }}.{{ .Values.tenant.location_short }}.{{ .Values.tenant.cloud }}.{{ .Values.tenant.domain }}
     {{- if .Values.system.target }}

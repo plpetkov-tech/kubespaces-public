@@ -2,6 +2,9 @@
 
 # -- vcluster values
 vcluster:
+
+  privateNodes:
+    enabled: true
   # -- vcluster isolation
   policies:
     podSecurityStandard: baseline
