@@ -14,10 +14,8 @@ spec:
     protocol: HTTPS
     tls:
       mode: Terminate
+      certificateRefs:
+        - name: apps-wildcard-tls
     allowedRoutes:
       namespaces:
         from: All
-    tls:
-      mode: Terminate
-      certificateRefs:
-        - name: apps-wildcard-tls
