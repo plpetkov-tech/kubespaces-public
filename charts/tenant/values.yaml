@@ -2,9 +2,20 @@
 
 # -- vcluster values
 vcluster:
-
+  sync:
+    toHost:
+      pods:
+        enabled: true
+        enforceTolerations:
+          - "kubernetes.azure.com/scalesetpriority=spot:NoSchedule"
+    fromHost:
+      nodes:
+        enabled: false
+        selector: 
+          labels:
+            workload: tenants
   privateNodes:
-    enabled: true
+    enabled: false
   # -- vcluster isolation
   policies:
     podSecurityStandard: baseline
@@ -45,6 +56,15 @@ vcluster:
 
   # -- this is crucial to allow the resulting kubeconfig to be used by the vcluster
   controlPlane:
+    statefulSet:
+      scheduling:
+        nodeSelector:
+          workload: tenants
+        tolerations:
+          - key: "kubernetes.azure.com/scalesetpriority"
+            operator: "Equal"
+            value: "spot"
+            effect: "NoSchedule"
     proxy:
       # -- placeholder, must be set and cannot work with default values
       extraSANs:

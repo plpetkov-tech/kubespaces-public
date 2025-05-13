@@ -11,7 +11,7 @@ export NODE_MAX=5
 export NODE_MIN=2
 export LOCATION=northeurope
 export NODE_SIZE=Standard_D16s_v6
-export TENANT_NODE_MIN_COUNT=0
+export TENANT_NODE_MIN_COUNT=1
 export TENANT_NODE_MAX_COUNT=10
 export TENANT_NODE_SIZE=Standard_D16s_v6
 ```
@@ -46,7 +46,6 @@ az aks create \
 az aks nodepool add \
     -g $CLUSTER_RG \
     --cluster-name $CLUSTER_NAME \
-    --node-count 0 \
     --enable-cluster-autoscaler \
     --min-count $TENANT_NODE_MIN_COUNT \
     --max-count $TENANT_NODE_MAX_COUNT \
@@ -54,7 +53,7 @@ az aks nodepool add \
     --os-type Linux  \
     --os-sku AzureLinux \
     --node-vm-size $TENANT_NODE_SIZE \
-    --labels "workload=tenants" --labels "priority=spot" \
+    --labels workload=tenants priority=spot \
     -n tenants \
     --mode User \
     --vm-set-type VirtualMachineScaleSets --no-wait
