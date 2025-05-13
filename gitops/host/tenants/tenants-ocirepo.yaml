@@ -1,5 +1,5 @@
 ---
-apiVersion: source.toolkit.fluxcd.io/v1beta2
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
   name: tenant-helmrepo
@@ -8,5 +8,3 @@ spec:
   interval: 5m
   type: oci
   url: oci://ghcr.io/kubespaces-io/kubespaces-public/tenant
-  ref:
-    tag: 0.1.6
