@@ -7,9 +7,21 @@ data:
   values.yaml: |
     _: &email alessandro.vozza@linux.com
     _: &solvers
-    - http01:
-        ingress:
-          class: nginx
+
+    - dns01:
+        cnameStrategy: Follow
+        azureDNS:
+          clientID: 62ef1af2-ba49-4dc6-b8d2-ea996700be4d
+          clientSecretSecretRef:
+          # The following is the secret we created in Kubernetes. Issuer will use this to present challenge to Azure DNS.
+            name: azuredns-config
+            key: client-secret
+          subscriptionID: 1c51d1c3-d83d-4d71-ace1-df3496eddac4
+          tenantID: 30c10907-19b2-4fb8-9272-a4a539628560
+          resourceGroupName: dns
+          hostedZoneName: kubespaces.cloud
+          # Azure Cloud Environment, default to AzurePublicCloud
+          environment: AzurePublicCloud   
 
     clusterIssuers:
     - name: letsencrypt-prod
