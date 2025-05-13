@@ -1,9 +1,10 @@
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
 metadata:
-  name: tenant-helmrepo
+  name: tenant-ocirepo
   namespace: flux-system
 spec:
-  type: "oci"
-  interval: 1m0s
+  interval: 10m
   url: oci://ghcr.io/kubespaces-io/kubespaces-public/tenant
+  ref:
+    semver: "0.1.6"
