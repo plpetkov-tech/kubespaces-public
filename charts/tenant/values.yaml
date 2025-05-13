@@ -114,3 +114,6 @@ tenant:
   domain: kubespaces.cloud 
   # -- the API port for the vcluster kubernetes API Server
   api_port: 443
+  # -- if using istio ambient mesh, set to true
+  ambient:
+    enabled: true

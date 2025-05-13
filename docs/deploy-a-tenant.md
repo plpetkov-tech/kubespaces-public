@@ -5,8 +5,8 @@ git clone https://github.com/kubespaces-io/kubespaces-public.git
 cd kubespaces-public/charts/vcluster
 
 ```bash
-export tenant=suse
-export org=meetup
+export tenant=meetup
+export org=suse
 export location_short=ne
 export cloud=azure
 export domain=kubespaces.cloud
@@ -20,8 +20,7 @@ helm upgrade -i -n $tenant-$org --create-namespace \
 --set tenant.domain=$domain \
 --set controlPlane.distro.k8s.version="v1.32.1" \
 --set "vcluster.exportKubeConfig.server=https://api.$tenant.$org.$location_short.$cloud.$domain" \
---set "vcluster.controlPlane.proxy.extraSANs[0]=api.$tenant.$org.$location_short.$cloud.$domain" \
---set "vcluster.policies.networkPolicy.enabled=false"
+--set "vcluster.controlPlane.proxy.extraSANs[0]=api.$tenant.$org.$location_short.$cloud.$domain"
 ```
 
 Access the tenant:
