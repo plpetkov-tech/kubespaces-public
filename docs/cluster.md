@@ -39,7 +39,6 @@ az aks create \
     --node-os-upgrade-channel NodeImage \
     --os-sku AzureLinux \
     --enable-managed-identity \
-    --api-server-authorized-ip-ranges 95.99.46.198/32 \
     --enable-addons azure-policy \
     --enable-defender 
 

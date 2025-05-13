@@ -1,7 +1,8 @@
 # Deploy a tenant vcluster
 
 ```bash
-cd charts/vcluster
+git clone https://github.com/kubespaces-io/kubespaces-public.git
+cd kubespaces-public/charts/vcluster
 
 ```bash
 export tenant=suse
