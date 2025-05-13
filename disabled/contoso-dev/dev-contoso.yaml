@@ -1,12 +1,12 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: contoso-dev-tenant
-  namespace: contoso-dev
+  name: dev-contoso-tenant
+  namespace: dev-contoso
 spec:
   interval: 10m
   timeout: 5m
-  releaseName: contoso-dev
+  releaseName: dev-contoso
   chartRef:
     kind: OCIRepository
     name: tenant-ocirepo
@@ -15,5 +15,5 @@ spec:
     mode: enabled
   valuesFrom:
     - kind: ConfigMap
-      name: contoso-dev-values # noqa: contoso
+      name: dev-contoso-values # noqa: contoso
       valuesKey: values.yaml

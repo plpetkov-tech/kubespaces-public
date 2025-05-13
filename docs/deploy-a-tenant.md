@@ -23,6 +23,8 @@ helm upgrade -i -n $tenant-$org --create-namespace \
 --set "vcluster.controlPlane.proxy.extraSANs[0]=api.$tenant.$org.$location_short.$cloud.$domain"
 ```
 
+kg po -n $tenant-$org -w
+
 Access the tenant:
 
 ```bash

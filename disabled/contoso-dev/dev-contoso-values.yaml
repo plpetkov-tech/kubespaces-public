@@ -1,25 +1,26 @@
+#tenant: dev, org: contoso, domain: kubespaces.cloud
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: contoso-dev
+  name: dev-contoso
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: contoso-dev-values
-  namespace: contoso-dev
+  name: dev-contoso-values
+  namespace: dev-contoso
 data:
   values.yaml: |
     tenant:
       location_short: ne
       cloud: azure
-      tenant: contoso
-      org: dev
+      tenant: dev
+      org: contoso
       domain: kubespaces.cloud
     vcluster:
       exportKubeConfig:
-        server: https://api.contoso.dev.ne.azure.kubespaces.cloud
+        server: https://api.dev.contoso.ne.azure.kubespaces.cloud
       controlPlane:
         proxy:
           extraSANs:
-            - api.contoso.dev.ne.azure.kubespaces.cloud
+            - api.dev.contoso.ne.azure.kubespaces.cloud
