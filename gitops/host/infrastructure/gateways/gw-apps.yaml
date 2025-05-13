@@ -6,6 +6,10 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
+  infrastructure:
+    annotations:
+      service.beta.kubernetes.io/port_443_health-probe_protocol: tcp
+      service.beta.kubernetes.io/port_80_health-probe_protocol: tcp
   gatewayClassName: istio
   listeners:
   - name: apps

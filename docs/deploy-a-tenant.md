@@ -20,7 +20,8 @@ helm upgrade -i -n $tenant-$org --create-namespace \
 --set tenant.domain=$domain \
 --set controlPlane.distro.k8s.version="v1.32.1" \
 --set "vcluster.exportKubeConfig.server=https://api.$tenant.$org.$location_short.$cloud.$domain" \
---set "vcluster.controlPlane.proxy.extraSANs[0]=api.$tenant.$org.$location_short.$cloud.$domain"
+--set "vcluster.controlPlane.proxy.extraSANs[0]=api.$tenant.$org.$location_short.$cloud.$domain" \
+--set "vcluster.policies.networkPolicy.enabled=false"
 ```
 
 Access the tenant:
