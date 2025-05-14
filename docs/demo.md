@@ -26,7 +26,7 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: nginx-x-default-x-suse-meetup
+        - name: nginx-x-default-x-meetup-suse
           port: 80
 EOF
 
