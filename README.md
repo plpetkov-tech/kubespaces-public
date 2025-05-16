@@ -1,142 +1,159 @@
-# KubeSpaces Helm Chart
+# Kubespaces
 
-This repository contains the Helm chart for deploying KubeSpaces tenants. A tenant in KubeSpaces is implemented as a vCluster running on a host cluster, providing isolated Kubernetes environments for developers and platform engineers.
+Kubespaces is a multi-tenant Kubernetes platform that enables secure and isolated tenant environments using virtual clusters. It provides a GitOps-based deployment model with comprehensive networking, security, and management capabilities.
+
+![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)
 
 ## Overview
 
-The KubeSpaces Helm chart enables the deployment of tenant vClusters with the following features:
-- Isolated Kubernetes environments using vCluster
-- Gateway API integration for ingress management
-- Network policies for tenant isolation
-- RBAC configuration for namespace access control
+Kubespaces creates isolated tenant environments using virtual clusters (vclusters) with:
+
+- Secure network isolation using Gateway API and Istio Ambient Mesh
+- Automatic DNS and TLS certificate management
+- Tenant-specific resource quotas and limits
+- Simple CLI management tool (`spacectl`)
+- GitOps-based deployment with Flux CD
+
+## Architecture
+
+The platform consists of a host Kubernetes cluster that manages multiple tenant virtual clusters:
+
+- **Host Cluster**: Contains shared infrastructure components (Istio, Gateway API, cert-manager, external-DNS)
+- **Tenant vClusters**: Isolated Kubernetes environments for each tenant with their own API server and control plane
+- **Gateway API**: Provides controlled network access to tenant environments
+- **Istio Ambient Mesh**: Enables secure service mesh capabilities
 
 ## Prerequisites
 
-- Kubernetes cluster (v1.24+)
-- Helm 3.x
-- Gateway API CRDs installed on the host cluster
-- vCluster operator installed on the host cluster
+- Kubernetes cluster v1.28+ (AKS, EKS, GKE, or kind for local development)
+- Helm 3.10+
+- kubectl 1.28+
+- Flux CD v2 (for GitOps deployments)
+- A domain name with DNS zone management (for external-dns)
 
 ## Installation
 
-1. Add the KubeSpaces Helm repository:
+### Setting up the Host Cluster
+
+1. Clone the repository:
 ```bash
-helm repo add kubespaces https://kubespaces-io.github.io/kubespaces-public
-helm repo update
+git clone https://github.com/kubespaces-io/kubespaces-public.git
+cd kubespaces-public
 ```
 
-2. Install a tenant:
+2. For AKS deployment, follow the instructions in [docs/cluster.md](docs/cluster.md):
 ```bash
-helm install my-tenant kubespaces/tenant \
-  --namespace my-tenant \
-  --create-namespace \
-  --set tenant.name=my-tenant \
-  --set tenant.organization=my-org
+# Example for creating an AKS cluster:
+export CLUSTER_RG=demo
+export CLUSTER_NAME=kubespaces
+export LOCATION=northeurope
+# See docs/cluster.md for full instructions
 ```
 
-## Configuration
+3. Install Flux CD:
+```bash
+flux install
+```
 
-Key configuration parameters:
+4. Create required secrets (see [docs/secrets.md](docs/secrets.md)):
+```bash
+# Example: Create secrets for external-dns and cert-manager
+kubectl create ns external-dns
+kubectl create secret generic azure-config-file -n external-dns --from-file=azure.json=/path/to/external-dns.json
+kubectl create configmap -n external-dns txt-owner-id --from-literal=txt-owner-id=your-cluster-id
+```
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `tenant.name` | Name of the tenant | `""` (required) |
-| `tenant.organization` | Organization ID | `""` (required) |
-| `tenant.resources.limits.cpu` | CPU limit for tenant workloads | `"4"` |
-| `tenant.resources.limits.memory` | Memory limit for tenant workloads | `"8Gi"` |
-| `tenant.networkPolicy.enabled` | Enable network policies | `true` |
-
-For a complete list of configuration options, see [values.yaml](./helm/tenant/values.yaml).
+5. Deploy the GitOps components:
+```bash
+kubectl apply -f gitops/host/host-gitrepo.yaml
+kubectl apply -f gitops/host/host-kustomization.yaml
+```
 
 ## Usage
 
-After installation, you can:
-1. Get the tenant's kubeconfig:
+### Managing Tenants with spacectl
+
+The `spacectl` CLI tool simplifies tenant management:
+
+#### Creating a Tenant
+
 ```bash
-kubectl get secret -n my-tenant my-tenant-kubeconfig -o jsonpath='{.data.config}' | base64 -d > kubeconfig.yaml
+# Create a tenant with default settings
+./spacectl tenant create --tenant dev --org contoso
+
+# Create a tenant with custom settings
+./spacectl tenant create \
+  --tenant dev \
+  --org contoso \
+  --cloud azure \
+  --location-short ne \
+  --domain kubespaces.cloud \
+  --k8s-version 1.31.1 \
+  --wait \
+  --output-file kubeconfig.yaml
 ```
 
-2. Use the kubeconfig to interact with your tenant:
+#### Updating a Tenant
+
 ```bash
-kubectl --kubeconfig kubeconfig.yaml get namespaces
+./spacectl tenant update \
+  --tenant dev \
+  --org contoso \
+  --k8s-version 1.32.0
 ```
 
-## Security
+#### Deleting a Tenant
 
-- Each tenant runs in an isolated vCluster
-- Network policies restrict tenant-to-tenant communication
-- RBAC roles are automatically created for namespace access control
-- Tenant resources are limited by default quotas
+```bash
+./spacectl tenant delete --tenant dev --org contoso
+```
+
+### Accessing Tenant Clusters
+
+After creating a tenant, you can access it using the generated kubeconfig:
+
+```bash
+# Export the kubeconfig
+kubectl get secret vc-dev-contoso -n dev-contoso -o yaml -o jsonpath='{.data.config}' | base64 -d > dev-contoso-kubeconfig
+export KUBECONFIG=dev-contoso-kubeconfig
+
+# Verify access
+kubectl get pods -A
+```
 
 ## Testing
 
-The repository includes a test suite that helps you verify the Helm chart functionality locally. The tests use Kind (Kubernetes in Docker) to create a local cluster and deploy a test tenant.
+Run the included test scripts to verify your deployment:
 
-### Prerequisites for Testing
-
-- Docker
-- Kind
-- kubectl
-- Helm 3.x
-- curl
-
-### Running Tests
-
-1. The test suite will:
-   - Create a Kind cluster named `kubespaces-host`
-   - Install required components (Gateway API, cert-manager, Istio)
-   - Deploy a test tenant
-   - Set up port-forwarding for local access
-
-2. Run the test script:
 ```bash
-cd tests
-./test_kubespaces.sh
+# Test GitOps deployment with kind
+./tests/test_gitops.sh
+
+# Test spacectl functionality
+./tests/test_spacectl.sh
 ```
 
-3. After the test completes, you can access the test tenant:
-```bash
-# Use the test tenant's kubeconfig
-export KUBECONFIG=$(pwd)/test_tenant.yaml
+## Documentation
 
-# Verify the tenant is working
-kubectl get namespaces
-```
+Detailed documentation is available in the `docs/` directory:
 
-4. Clean up when done:
-```bash
-# Kill the port-forwarding process
-kill $PF_PID  # The PID is shown in the test output
-
-# Optional: Delete the Kind cluster
-kind delete cluster --name kubespaces-host
-```
-
-### Test Environment Details
-
-The test environment includes:
-- A local Kind cluster with Gateway API support
-- Istio ambient mesh for service mesh capabilities
-- cert-manager for certificate management
-- A test tenant with:
-  - Isolated vCluster environment
-  - Network policies
-  - RBAC configuration
-  - Local domain (localhost) setup
-
-The test tenant is configured with minimal resources suitable for local testing. For production deployments, adjust the resource limits and other parameters as needed.
+- [Cluster Setup](docs/cluster.md) - Creating a Kubernetes cluster for Kubespaces
+- [Deploy a Tenant](docs/deploy-a-tenant.md) - Step-by-step guide for tenant deployment
+- [External DNS](docs/external-dns.md) - Setting up DNS for tenant access
+- [AAD Integration](docs/aad.md) - Connecting tenants to Azure Active Directory
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
 
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](./LICENSE) file for details.
 
-## Roadmap
+## ToDo
 
-- [ ] Implement HTTPRoute patches for proper host cluster integration
-- [ ] Add Istio Ambient (HBONE) port (15008) to NetworkPolicy
-- [ ] Create tenant deployment demo
+- [ ] Add more details to the README
+- [ ] Use [patches](https://www.vcluster.com/docs/vcluster/0.20.0/configure/vcluster-yaml/experimental/generic-sync?x1=1#patches-reference) to rewrite the HTTPRoute in the tenant vcluster to a proper format in the host cluster
+- [ ] Add a demo for the tenant vcluster
+- [ ] Add the HBONE Istio Ambient port (15008) to the NetworkPolicy created bu vcluster helm chart
 - [ ] Improve CLI safety checks and error messages

@@ -38,3 +38,4 @@ terraform.rc
 
 # Ignore downloaded Istio directory in tests folder
 tests/istio-*/
+llm_text.txt
